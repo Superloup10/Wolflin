@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "wolflin:block/block_test"
+    }
+  }
+}
