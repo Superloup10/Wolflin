@@ -9,8 +9,8 @@ import net.minecraftforge.fml.Logging.LOADING
 import net.minecraftforge.forgespi.language.IModInfo
 import net.minecraftforge.forgespi.language.ModFileScanData
 import org.apache.logging.log4j.LogManager
+import java.util.*
 import java.util.function.Consumer
-import java.util.function.Supplier
 
 class WolflinModContainer(info: IModInfo, className: String, val modClassLoader: ClassLoader, val modFileScanData: ModFileScanData): ModContainer(info) {
     private val LOGGER = LogManager.getLogger()
@@ -28,8 +28,8 @@ class WolflinModContainer(info: IModInfo, className: String, val modClassLoader:
         this.triggerMap[ModLoadingStage.ENQUEUE_IMC] = this.dummy().andThen {this.beforeEvent(it)}.andThen {this.initMod(it)}.andThen {this.fireEvent(it)}.andThen {this.afterEvent(it)}
         this.triggerMap[ModLoadingStage.PROCESS_IMC] = this.dummy().andThen {this.beforeEvent(it)}.andThen {this.fireEvent(it)}.andThen {this.afterEvent(it)}
         this.triggerMap[ModLoadingStage.COMPLETE] = this.dummy().andThen {this.beforeEvent(it)}.andThen {this.completeLoading(it)}.andThen {this.fireEvent(it)}.andThen {this.afterEvent(it)}
-
         eventBus = IEventBus.create(this::onEventFailed)
+        this.configHandler = Optional.of(Consumer {this.eventBus.post(it)})
         try {
             modClass = Class.forName(className, false, modClassLoader)
             LOGGER.debug(LOADING, "Loaded modclass ${modClass.name} with ${modClass.classLoader}")
@@ -96,15 +96,3 @@ class WolflinModContainer(info: IModInfo, className: String, val modClassLoader:
     override fun getMod() = this.modInstance
     fun getEventBus(): IEventBus = this.eventBus
 }
-
-fun LifecycleEventProvider.LifecycleEvent.getOrBuildEvent(modContainer: ModContainer): Event {
-    val field = javaClass.getDeclaredField("customEventSupplier")
-    field.isAccessible = true
-    @Suppress("UNCHECKED_CAST")
-    val customEventSupplier = field.get(this) as Supplier<Event>?
-    if(customEventSupplier != null) {
-        return customEventSupplier.get()
-    }
-    return this.fromStage().getModEvent(modContainer)
-}
-
