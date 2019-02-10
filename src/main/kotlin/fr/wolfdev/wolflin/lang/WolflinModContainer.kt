@@ -31,7 +31,7 @@ class WolflinModContainer(info: IModInfo, className: String, val modClassLoader:
 
         eventBus = IEventBus.create(this::onEventFailed)
         try {
-            modClass = Class.forName(className, true, modClassLoader)
+            modClass = Class.forName(className, false, modClassLoader)
             LOGGER.debug(LOADING, "Loaded modclass ${modClass.name} with ${modClass.classLoader}")
         } catch(e: Throwable) {
             LOGGER.error(LOADING, "Failed to load class $className", e)

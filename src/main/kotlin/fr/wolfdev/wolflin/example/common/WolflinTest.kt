@@ -12,12 +12,9 @@ import org.apache.logging.log4j.LogManager
 import java.util.stream.Collectors
 
 @Mod(WolflinTest.MODID)
-class WolflinTest {
-    companion object {
-        const val MODID = "wolflin"
-        val LOGGER = LogManager.getLogger()
-    }
-
+object WolflinTest {
+    const val MODID = "wolflin"
+    val LOGGER = LogManager.getLogger()
     init {
         WolflinModLoadingContext.get().getModEventBus().addListener<FMLCommonSetupEvent> {this.setup(it)}
         WolflinModLoadingContext.get().getModEventBus().addListener<InterModEnqueueEvent> {this.enqueueIMC(it)}
